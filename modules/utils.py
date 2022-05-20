@@ -161,14 +161,17 @@ def whoami(sender, msg):
 @command('stop', )
 @group('Kaiser', )
 def stop_bot(sender, msg):
+    Bot.send_msg_to_client(bot.ts3conn, sender, "stop bot")
     Moduleloader.exit_all()
     bot.ts3conn.quit()
     logger.warning("Bot was quit!")
 
 
+
 @command('restart', )
 @group('Kaiser', )
 def restart_bot(sender, msg):
+    Bot.send_msg_to_client(bot.ts3conn, sender, "restart bot")
     Moduleloader.exit_all()
     bot.ts3conn.quit()
     logger.warning("Bot was quit!")

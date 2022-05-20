@@ -1,8 +1,11 @@
 """AfkMover Module for the Teamspeak3 Bot."""
 from __future__ import annotations
 
+import datetime
 from threading import Thread
 import traceback
+from typing import Dict
+
 from Moduleloader import *
 import ts3.Events as Events
 import threading
@@ -15,6 +18,7 @@ bot: Bot.Ts3Bot | None = None
 autoStart = True
 AFK_CHANNEL = "Bin weg"
 channel_name = AFK_CHANNEL
+MUTE_TIME = datetime.timedelta(minutes=5)
 
 
 @command('startafk', 'afkstart', 'afkmove', )
@@ -28,6 +32,9 @@ def start_afkmover(sender=None, msg=None):
         afkMover = AfkMover(afkStopper, bot.ts3conn)
         afkStopper.clear()
         afkMover.start()
+        Bot.send_msg_to_client(bot.ts3conn, sender, "AFK mover started.")
+    else:
+        Bot.send_msg_to_client(bot.ts3conn, sender, "AFK already running.")
 
 
 @command('stopafk', 'afkstop')
@@ -39,6 +46,7 @@ def stop_afkmover(sender=None, msg=None):
     global afkMover
     afkStopper.set()
     afkMover = None
+    Bot.send_msg_to_client(bot.ts3conn, sender, "AFK mover stopped.")
 
 
 @command('afkgetclientchannellist')
@@ -49,6 +57,30 @@ def get_afk_list(sender=None, msg=None):
     """
     if afkMover is not None:
         Bot.send_msg_to_client(bot.ts3conn, sender, str(afkMover.client_channels))
+
+
+@command('getmutedsincelist', )
+@group('Kaiser', 'Truchsess', 'Bürger')
+def get_muted_since_list(sender=None, msg=None):
+    if afkMover is not None:
+        Bot.send_msg_to_client(bot.ts3conn, sender, str(afkMover.muted_since))
+
+
+@command('getmutetime', )
+@group('Kaiser', 'Truchsess', 'Bürger', )
+def get_mute_time(sender=None, msg=None):
+    Bot.send_msg_to_client(bot.ts3conn, sender, f"mute time set to {MUTE_TIME.seconds / 60} minutes.")
+
+
+@command('setmutetime', )
+@group('Kaiser', 'Truchsess', )
+def set_mute_time(sender=None, msg=None):
+    global MUTE_TIME
+    _command, time = msg.split(' ')
+    new_mute_time = float(time)
+    if new_mute_time > 0:
+        MUTE_TIME = datetime.timedelta(minutes=new_mute_time)
+    Bot.send_msg_to_client(bot.ts3conn, sender, f"mute time set to {new_mute_time} minutes.")
 
 
 @event(Events.ClientLeftEvent, )
@@ -106,6 +138,7 @@ class AfkMover(Thread):
         self.ts3conn = ts3conn
         self.afk_channel = self.get_afk_channel(channel_name)
         self.client_channels = {}
+        self.muted_since: Dict[int, datetime.datetime] = dict()
         self.afk_list = None
         if self.afk_channel is None:
             AfkMover.logger.error("Could not get afk channel")
@@ -125,7 +158,7 @@ class AfkMover(Thread):
         Update the list of clients.
         """
         try:
-            self.afk_list = self.ts3conn.clientlist(["away"])
+            self.afk_list = self.ts3conn.clientlist(["away", "voice"])
             AfkMover.logger.debug("Awaylist: " + str(self.afk_list))
         except TS3Exception:
             AfkMover.logger.exception("Error getting away list!")
@@ -144,10 +177,25 @@ class AfkMover(Thread):
                 if "cid" not in client.keys():
                     AfkMover.logger.error("Client without cid!")
                     AfkMover.logger.error(str(client))
-                elif "client_away" in client.keys() and \
-                        client.get("client_away", '0') == '1' and \
-                        int(client.get("cid", '-1')) != int(self.afk_channel):
+                elif client.get("client_away", '0') == '1' and int(client.get("cid", '-1')) != int(self.afk_channel):
                     awaylist.append(client)
+                elif "client_output_muted" in client.keys() and int(client.get("cid", '-1')) != int(self.afk_channel):
+                    clid = client.get("clid", '-1')
+                    if client["client_output_muted"] == '1':
+                        # client is muted
+                        if clid in self.muted_since:
+                            # still muted, but more than x minutes?
+                            if datetime.datetime.now() - self.muted_since[clid] > MUTE_TIME:
+                                # regarded as AFK
+                                awaylist.append(client)
+                        else:
+                            # add to mute list
+                            self.muted_since[clid] = datetime.datetime.now()
+                    else:
+                        # client is not muted
+                        if clid in self.muted_since:
+                            # delete from muted dict
+                            del self.muted_since[clid]
             return awaylist
         else:
             AfkMover.logger.error("Clientlist is None!")
@@ -155,12 +203,12 @@ class AfkMover(Thread):
 
     def get_back_list(self):
         """
-        Get list of clients in the afk channel, but not away.
+        Get list of clients in the afk channel, but not away or muted.
         :return: List of clients who are back from afk.
         """
         clientlist = [client for client in self.afk_list if
-                      client.get("client_away", '1') == '0' and int(client.get("cid", '-1'))
-                      == int(self.afk_channel)]
+                      client.get("client_away", '1') == '0' and client.get("client_output_muted", '1') == '0' and
+                      int(client.get("cid", '-1')) == int(self.afk_channel)]
         return clientlist
 
     def get_afk_channel(self, name=AFK_CHANNEL):

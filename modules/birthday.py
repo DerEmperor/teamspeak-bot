@@ -130,6 +130,9 @@ def start_birthday_notifier(sender=None, msg=None):
         birthdayNotifier = BirthdayNotifier(birthday_file, birthdayNotifierStopper, bot.ts3conn)
         birthdayNotifierStopper.clear()
         birthdayNotifier.start()
+        Bot.send_msg_to_client(bot.ts3conn, sender, "Birthday notifier started.")
+    else:
+        Bot.send_msg_to_client(bot.ts3conn, sender, "Birthday notifier already running.")
 
 
 @command('stopbirthday', 'birthdaystop')
@@ -141,6 +144,7 @@ def stop_birthday_notifier(sender=None, msg=None):
     global birthdayNotifier
     birthdayNotifierStopper.set()
     birthdayNotifier = None
+    Bot.send_msg_to_client(bot.ts3conn, sender, "Birthday notifier stopped.")
 
 
 @setup
