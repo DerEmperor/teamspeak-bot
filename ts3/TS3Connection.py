@@ -9,11 +9,11 @@ import traceback
 
 import blinker
 
-from . import Events
-from . import utilities
-from .Events import TS3Event
-from .TS3QueryExceptionType import TS3QueryExceptionType
-from .utilities import TS3Exception, TS3ConnectionClosedException
+import Events
+import utilities
+from Events import TS3Event
+from TS3QueryExceptionType import TS3QueryExceptionType
+from utilities import TS3Exception, TS3ConnectionClosedException
 
 
 class TS3Connection:
@@ -62,7 +62,7 @@ class TS3Connection:
             self._logger.debug(self._conn.read_until(b"\n\r"))
             self._logger.debug(self._conn.read_until(b"\n\r"))
         else:
-            from .SSHConnWrapper import SSHConnWrapper
+            from SSHConnWrapper import SSHConnWrapper
             self._conn = SSHConnWrapper(host, port, username, password,
                                         accept_all_keys=accept_all_keys,
                                         host_key_file=host_key_file, timeout=sshtimeout,

@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from Moduleloader import *
 import Moduleloader
 import Bot
@@ -5,7 +7,7 @@ import logging
 from ts3.TS3Connection import TS3QueryException
 
 __version__ = "0.4"
-bot: Bot.Ts3Bot = None
+bot: Bot.Ts3Bot | None = None
 logger = logging.getLogger("bot")
 
 

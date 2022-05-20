@@ -1,12 +1,13 @@
 import logging
 from unittest import TestCase
 
-from .Events import ClientLeftEvent, ReasonID, ClientKickedEvent, ClientBannedEvent
-from .TS3Connection import TS3Connection
+from Events import ClientLeftEvent, ReasonID, ClientKickedEvent, ClientBannedEvent
+from TS3Connection import TS3Connection
 
 
 class MockTS3Connection(TS3Connection):
     def __init__(self):
+        super().__init__()
         self._logger = logging.Logger(__name__, logging.DEBUG)
         self._logger.addHandler(logging.StreamHandler())
 

@@ -1,18 +1,18 @@
 from __future__ import annotations
 
-import configparser
 import importlib
 import logging
 import sys
 import re
-import modules
 from typing import List
+from CommandHandler import CommandHandler
+from EventHandler import EventHandler
 
 setups = []
 exits = []
 plugin_modules = {}
-event_handler = None
-command_handler = None
+event_handler: EventHandler | None = None
+command_handler: CommandHandler | None = None
 logger = logging.getLogger("moduleloader")
 logger.setLevel(logging.INFO)
 file_handler = logging.FileHandler("moduleloader.log", mode='a+')
@@ -22,7 +22,7 @@ logger.addHandler(file_handler)
 logger.info("Configured Moduleloader logger")
 logger.propagate = 0
 
-command_pattern = re.compile(r'(?:\'([^\']*)\')|(?:\"([^\"]*)\")|([^\'\"\s][^\s]*)')
+command_pattern = re.compile(r'\'([^\']*)\'|\"([^\"]*)\"|([^\'\"\s][^\s]*)')
 
 
 def split_command(_command: str) -> List[str]:
@@ -35,6 +35,7 @@ def load_modules(bot, config):
     """
     Load modules specified in the Plugins section of config.ini.
     :param bot: Bot to pass to the setup function of the modules
+    :param config: was missing
     """
     global event_handler, command_handler
     plugins = config.pop('Plugins')
@@ -80,7 +81,7 @@ def event(*event_types):
     """
     Decorator to register a function as an eventlistener for the event types specified in event_types.
     :param event_types: Event types to listen to
-    :type event_types: list[TS3Event]
+    :type event_types: TS3Event
     """
 
     def register_observer(function):

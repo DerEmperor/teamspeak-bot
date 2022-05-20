@@ -3,7 +3,7 @@
 # FROM OLD API
 # Don't change the order in this map, otherwise it might break!
 _ESCAPE_MAP = [("\\", r"\\"), ("/", r"\/"), (" ", r"\s"), ("|", r"\p"), ("\a", r"\a"),
-    ("\b", r"\b"), ("\f", r"\f"), ("\n", r"\n"), ("\r", r"\r"), ("\t", r"\t"), ("\v", r"\v")]
+               ("\b", r"\b"), ("\f", r"\f"), ("\n", r"\n"), ("\r", r"\r"), ("\t", r"\t"), ("\v", r"\v")]
 
 
 def escape(raw):

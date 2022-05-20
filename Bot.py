@@ -1,3 +1,4 @@
+from __future__ import annotations
 import os
 import logging
 from distutils.util import strtobool
@@ -194,7 +195,7 @@ class Ts3Bot:
         self.command_handler = None
         self.channel = None
         self.logger = logger
-        self.ts3conn: TS3Connection = None
+        self.ts3conn: TS3Connection | None = None
         self.is_ssh = bool(strtobool(ssh))
         # Strtobool returns 1/0 ...
         self.accept_all_keys = bool(strtobool(acceptallsshkeys))

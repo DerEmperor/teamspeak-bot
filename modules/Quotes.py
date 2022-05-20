@@ -1,11 +1,13 @@
 """Quote module for the Teamspeak 3 Bot. Sends quotes to people joining the server."""
+from __future__ import annotations
+
 import Bot
 import random
 import codecs
 import Moduleloader
 import ts3.Events as Events
 
-bot = None
+bot: Bot.Ts3Bot | None = None
 # Server groups who should not receiver quotes upon joining the server
 dont_send = []
 
@@ -30,7 +32,7 @@ def add(q):
     :param q: Quote to add.
     """
     with codecs.open("quotes", "a+", "ISO-8859-1") as f:
-        f.write(q+"\n")
+        f.write(q + "\n")
 
 
 @Moduleloader.setup
@@ -47,7 +49,7 @@ def setup_quoter(ts3bot):
             dont_send.append(int(g.get('sgid', 0)))
 
 
-@Moduleloader.event(Events.ClientEnteredEvent,)
+@Moduleloader.event(Events.ClientEnteredEvent, )
 def inform(evt):
     """
     Send out a quote to joining users.
@@ -63,8 +65,8 @@ def inform(evt):
         Bot.send_msg_to_client(bot.ts3conn, evt.client_id, quote)
 
 
-@Moduleloader.command('addquote',)
-@group('Kaiser', 'Truchsess', 'Bürger')
+@Moduleloader.command('addquote', )
+@Moduleloader.group('Kaiser', 'Truchsess', 'Bürger')
 def add_quote(sender, msg):
     """
     Add a quote.
@@ -72,4 +74,3 @@ def add_quote(sender, msg):
     if len(msg) > len("!addQuote "):
         add(msg[len("!addQuote "):])
         Bot.send_msg_to_client(bot.ts3conn, sender, "Quote '" + msg[len("!addQuote "):] + "' was added.")
-

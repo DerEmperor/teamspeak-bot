@@ -1,4 +1,6 @@
 #!/usr/bin/env python3
+from __future__ import annotations
+
 import Bot
 import sys
 import logging
@@ -6,7 +8,7 @@ import threading
 import os
 from ts3.utilities import TS3ConnectionClosedException
 
-logger = None
+logger: logging.Logger | None = None
 bot = None
 
 

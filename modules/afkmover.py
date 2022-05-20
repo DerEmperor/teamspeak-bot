@@ -9,9 +9,9 @@ import threading
 import Bot
 from ts3.utilities import TS3Exception
 
-afkMover: AfkMover = None
+afkMover: AfkMover | None = None
 afkStopper = threading.Event()
-bot: Bot.Ts3Bot = None
+bot: Bot.Ts3Bot | None = None
 autoStart = True
 AFK_CHANNEL = "Bin weg"
 channel_name = AFK_CHANNEL
@@ -52,14 +52,14 @@ def get_afk_list(sender=None, msg=None):
 
 
 @event(Events.ClientLeftEvent, )
-def client_left(event):
+def client_left(_event):
     """
     Clean up leaving clients.
     """
     # Forgets clients that were set to afk and then left
     if afkMover is not None:
-        if str(event.client_id) in afkMover.client_channels:
-            del afkMover.client_channels[str(event.client_id)]
+        if str(_event.client_id) in afkMover.client_channels:
+            del afkMover.client_channels[str(_event.client_id)]
 
 
 @setup
@@ -96,8 +96,8 @@ class AfkMover(Thread):
     def __init__(self, _event, ts3conn):
         """
         Create a new AfkMover object.
-        :param event: Event to signalize the AfkMover to stop moving.
-        :type event: threading.Event
+        :param _event: Event to signalize the AfkMover to stop moving.
+        :type _event: threading.Event
         :param ts3conn: Connection to use
         :type: TS3Connection
         """

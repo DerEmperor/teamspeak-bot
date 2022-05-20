@@ -3,7 +3,7 @@ from os.path import isfile
 
 import paramiko
 
-from .utilities import TS3Exception, TS3ConnectionClosedException
+from utilities import TS3Exception, TS3ConnectionClosedException
 
 
 class SSHConnWrapper:
@@ -42,7 +42,7 @@ class SSHConnWrapper:
         else:
             raise TS3Exception("Connecting via ssh requires a password.")
 
-    def read_until(self, delimiter, timeout=None):
+    def read_until(self, delimiter):
         """
         Read until a given byte string, delimiter, or until  the timeout limit set is reached.
         The timeout parameter is ignored.

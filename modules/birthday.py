@@ -8,7 +8,7 @@ from modules.utils import send_message_to_everyone, poke_message_to_everyone
 import json
 import datetime
 from time import sleep
-from typing import List
+from typing import List, Dict
 from dataclasses import dataclass
 
 FILE_NAME = 'birthdays.json'
@@ -17,9 +17,9 @@ BIRTHDAY_CHANNEL_ID2 = 96
 TIME_FOR_NOTIFICATION = [datetime.timedelta(minutes=5), datetime.timedelta(seconds=15)]
 TIME_FOR_NOTIFICATION.sort(reverse=True)
 
-birthdayNotifier: BirthdayNotifier = None
+birthdayNotifier: BirthdayNotifier | None = None
 birthdayNotifierStopper = threading.Event()
-bot: Bot.Ts3Bot = None
+bot: Bot.Ts3Bot | None = None
 birthday_file = FILE_NAME
 autoStart = True
 
@@ -181,7 +181,7 @@ class Birthday:
         else:
             return age - 1
 
-    def dict(self):
+    def dict(self) -> Dict[str, str | datetime.date | int | bool]:
         return {'name': self.name, 'birthday': self.birthday, 'year': self.year, 'active': self.active}
 
     def __str__(self):
@@ -290,7 +290,7 @@ class BirthdayNotifier(Thread):
             data.append(birthday)
 
         # sort by days
-        data.sort(key=lambda birthday: birthday.birthday)
+        data.sort(key=lambda _birthday: _birthday.birthday)
 
         self.birthdays = data
 
@@ -318,21 +318,21 @@ class BirthdayNotifier(Thread):
 
     def refresh_birthday_channel(self):
         # get next birthdays
-        next_birthday: Birthday = None
-        second_next_birthday: Birthday = None
+        next_bday = self.birthdays[0]
+        second_next_birthday = self.birthdays[1]
         first = True
         for birthday in self.birthdays:
             if birthday.active:
                 if first:
-                    next_birthday = birthday
+                    next_bday = birthday
                     first = False
                 else:
                     second_next_birthday = birthday
                     break
 
         # create channel names
-        next_birthday_name = f'[cspacer]{next_birthday.name} {date_to_str(next_birthday.birthday)}'
-        age = next_birthday.age
+        next_birthday_name = f'[cspacer]{next_bday.name} {date_to_str(next_bday.birthday)}'
+        age = next_bday.age
         if age:
             next_birthday_name += f' ({age})'
         second_next_birthday_name = f'[cspacer] {second_next_birthday.name} {date_to_str(second_next_birthday.birthday)}'
