@@ -26,7 +26,6 @@ https://github.com/Murgeye/ts3API.
 	- [Installation](#installation)
 	- [Code Example](#code-example)
 	- [Calling functions not explicitly implemented](#calling-functions-not-explicitly-implemented)
-	- [Code Example](#code-example)
 	- [Troubleshooting API](#troubleshooting-api)
 
 # Getting the bot
@@ -353,7 +352,7 @@ servergroupaddclient(sgid=servergroup_id, cldbid=client_db_id)
 The `servergroupaddclient` command is not currently implemented explicitly. However, you can still
 call it if you know the parameters it need (sgid and cldbid).
 
-## Troubleshooting
+## Troubleshooting API
 
 For general troubleshooting please also have a look at the troubleshooting section
 in https://github.com/Murgeye/ts3Bot. If any questions remain, feel free to open an issue.
