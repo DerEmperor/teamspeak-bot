@@ -9,11 +9,11 @@ import traceback
 
 import blinker
 
-import Events
-import utilities
-from Events import TS3Event
-from TS3QueryExceptionType import TS3QueryExceptionType
-from utilities import TS3Exception, TS3ConnectionClosedException
+import ts3.Events as Events
+import ts3.utilities as utilities
+from ts3.Events import TS3Event
+from ts3.TS3QueryExceptionType import TS3QueryExceptionType
+from ts3.utilities import TS3Exception, TS3ConnectionClosedException
 
 
 class TS3Connection:
