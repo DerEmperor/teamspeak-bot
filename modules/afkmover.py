@@ -63,7 +63,11 @@ def get_afk_list(sender=None, msg=None):
 @group('Kaiser', 'Truchsess', 'Bürger')
 def get_muted_since_list(sender=None, msg=None):
     if afkMover is not None:
-        Bot.send_msg_to_client(bot.ts3conn, sender, str(afkMover.muted_since))
+        message = "{"
+        for clid, time in afkMover.muted_since.items():
+            message += f"{clid}: {time.hour}:{time.minute}:{time.second}, "
+        message = message[:-2] + "}"
+        Bot.send_msg_to_client(bot.ts3conn, sender, message)
 
 
 @command('getmutetime', )
