@@ -356,14 +356,15 @@ class BirthdayNotifier(Thread):
 
     def refresh_todays_birthday(self):
         self.refresh_birthday_list()
-        if self.get_next_birthday().birthday == today():
+        next_bday = self.get_next_birthday()
+        if next_bday.birthday == today():
             # someone's birthday is today
-            if self.get_next_birthday() == self.todays_birthday:
+            if next_bday == self.todays_birthday:
                 # everything is ok
                 pass
             else:
                 # set birthday
-                self.todays_birthday = self.get_next_birthday()
+                self.todays_birthday = next_bday
             bday = self.todays_birthday
             if bday.age:
                 bot.ts3conn.set_hostmessage(f"Alles Gute zum {bday.age}. Geburtstag, {bday.name}")
