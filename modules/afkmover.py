@@ -96,6 +96,8 @@ def client_left(_event):
     if afkMover is not None:
         if str(_event.client_id) in afkMover.client_channels:
             del afkMover.client_channels[str(_event.client_id)]
+        if _event.client_id in afkMover.muted_since:
+            del afkMover.muted_since[_event.client_id]
 
 
 @setup
