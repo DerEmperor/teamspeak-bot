@@ -338,12 +338,18 @@ class BirthdayNotifier(Thread):
         next_birthday_name = f'[cspacer]{next_bday.name} {date_to_str(next_bday.birthday)}'
         age = next_bday.age
         if age:
-            next_birthday_name += f' ({age})'
+            if next_bday.birthday > datetime.date.today():
+                next_birthday_name += f' ({age + 1})'
+            else:
+                next_birthday_name += f' ({age})'
         second_next_birthday_name = f'[cspacer] {second_next_birthday.name} {date_to_str(second_next_birthday.birthday)}'
 
         age = second_next_birthday.age
         if age:
-            second_next_birthday_name += f' ({age})'
+            if next_bday.birthday > datetime.date.today():
+                second_next_birthday_name += f' ({age + 1})'
+            else:
+                second_next_birthday_name += f' ({age})'
 
         # set channel names
         bot.ts3conn.set_channel_name(BIRTHDAY_CHANNEL_ID1, next_birthday_name)
