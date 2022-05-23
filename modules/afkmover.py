@@ -244,6 +244,8 @@ class AfkMover(Thread):
             except TS3Exception:
                 AfkMover.logger.exception("Error moving client! Clid=" + str(client.get("clid", '-1')))
             self.client_channels[client.get("clid", '-1')] = client.get("cid", '0')
+            if client.get("clid", '-1') in self.muted_since:
+                del self.muted_since[client.get("clid", '-1')]
             AfkMover.logger.debug("Moved List after move: " + str(self.client_channels))
 
     def move_all_afk(self):
