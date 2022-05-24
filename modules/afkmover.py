@@ -65,7 +65,9 @@ def get_muted_since_list(sender=None, msg=None):
     if afkMover is not None:
         message = "{"
         for clid, time in afkMover.muted_since.items():
-            message += f"{clid}: {time.hour}:{time.minute}:{time.second}, "
+            message += f"{afkMover.get_name(clid)}: {time.hour}:{time.minute}:{time.second}, "
+        if len(message) <= 1:
+            message += ", "
         message = message[:-2] + "}"
         Bot.send_msg_to_client(bot.ts3conn, sender, message)
 
@@ -164,7 +166,8 @@ class AfkMover(Thread):
         Update the list of clients.
         """
         try:
-            self.afk_list = self.ts3conn.clientlist(["away", "voice"])
+            afk_list = self.ts3conn.clientlist(["away", "voice"])
+            self.afk_list = [client for client in afk_list if client.get('client_type', '1') == '0']  # ignore bots
             AfkMover.logger.debug("Awaylist: " + str(self.afk_list))
         except TS3Exception:
             AfkMover.logger.exception("Error getting away list!")
@@ -185,9 +188,10 @@ class AfkMover(Thread):
                     AfkMover.logger.error(str(client))
                 elif client.get("client_away", '0') == '1' and int(client.get("cid", '-1')) != int(self.afk_channel):
                     awaylist.append(client)
-                elif "client_output_muted" in client.keys() and int(client.get("cid", '-1')) != int(self.afk_channel):
+                elif ("client_output_muted" in client.keys() or "client_output_hardware" in client.keys()) and \
+                        int(client.get("cid", '-1')) != int(self.afk_channel):
                     clid = client.get("clid", '-1')
-                    if client["client_output_muted"] == '1':
+                    if client["client_output_muted"] == '1' or client["client_output_hardware"] == '0':
                         # client is muted
                         if clid in self.muted_since:
                             # still muted, but more than x minutes?
@@ -212,10 +216,14 @@ class AfkMover(Thread):
         Get list of clients in the afk channel, but not away or muted.
         :return: List of clients who are back from afk.
         """
-        clientlist = [client for client in self.afk_list if
-                      client.get("client_away", '1') == '0' and client.get("client_output_muted", '1') == '0' and
-                      int(client.get("cid", '-1')) == int(self.afk_channel)]
-        return clientlist
+        return [
+            client for client in self.afk_list if (
+                    client.get("client_away", '1') == '0' and
+                    client.get("client_output_muted", '1') == '0' and
+                    client.get("client_output_hardware", '0') == '1' and
+                    int(client.get("cid", '-1')) == int(self.afk_channel)
+            )
+        ]
 
     def get_afk_channel(self, name=AFK_CHANNEL):
         """
@@ -291,3 +299,10 @@ class AfkMover(Thread):
                 AfkMover.logger.error("Saved channel list keys are:" + str(self.client_channels.keys()) + "\n")
         AfkMover.logger.warning("AFKMover stopped!")
         self.client_channels = {}
+
+    def get_name(self, clid):
+        name = str(clid)
+        for client in self.afk_list:
+            if client.get('clid', '-1') == str(clid):
+                name = client['client_nickname']
+        return name
