@@ -4,6 +4,7 @@ from Moduleloader import *
 import Moduleloader
 import Bot
 import logging
+from random import shuffle
 from ts3.TS3Connection import TS3QueryException
 
 __version__ = "0.4"
@@ -167,7 +168,6 @@ def stop_bot(sender, msg):
     logger.warning("Bot was quit!")
 
 
-
 @command('restart', )
 @group('Kaiser', )
 def restart_bot(sender, msg):
@@ -198,3 +198,50 @@ def set_hostmessage(sender, msg):
 def set_hostmessage(sender, msg):
     bot.ts3conn.disable_hostmessage()
     Bot.send_msg_to_client(bot.ts3conn, sender, "disable hostmessage")
+
+
+@command('maketeams', 'teams', )
+@group('Kaiser', 'Truchsess', 'Bürger', )
+def maketeams(sender, msg):
+    # process args
+    args = messages = split_command(msg)
+    if len(args) == 1:
+        args = '2'
+    elif len(args) > 2:
+        Bot.send_msg_to_client(bot.ts3conn, sender, 'specify only number of teams')
+        return
+    else:
+        args = args[1]
+    if not args.isdigit():
+        Bot.send_msg_to_client(bot.ts3conn, sender, 'number of teams is not an integer')
+    number_of_teams = int(args)
+
+    # get clients and put in teams
+    clients = bot.ts3conn.clientlist()
+
+    # get channel id
+    cid = None
+    for client in clients:
+        if client.get('clid', -1) == str(sender):
+            cid = int(client.get('cid', None))
+            break
+    if not cid:
+        Bot.send_msg_to_client(bot.ts3conn, sender, 'Internal Error')
+        return
+
+    players = []
+    for client in clients:
+        if client.get('cid', -1) == str(cid):
+            players.append(client.get('client_nickname', client.get('clid', -1)))
+
+    shuffle(players)
+    teams = [[] for i in range(number_of_teams)]
+    for i, player in enumerate(players):
+        teams[i % number_of_teams].append(player)
+
+    # send message
+    message = '\n'
+    for i, team in enumerate(teams):
+        message += f'team {i + 1}: {team}\n'
+    Bot.send_msg_to_server(bot.ts3conn, message)
+    Bot.send_msg_to_client(bot.ts3conn, sender, 'Done')

@@ -200,7 +200,8 @@ class AfkMover(Thread):
                                 awaylist.append(client)
                         else:
                             # add to mute list
-                            self.muted_since[clid] = datetime.datetime.now()
+                            if client.get('cid', -1) not in (56, 90, 51, 88, 52):
+                                self.muted_since[clid] = datetime.datetime.now()
                     else:
                         # client is not muted
                         if clid in self.muted_since:

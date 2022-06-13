@@ -52,6 +52,22 @@ def send_msg_to_client(ts3conn, clid, msg):
         logger.exception("Error sending a message to clid " + str(clid))
 
 
+def send_msg_to_server(ts3conn, msg):
+    """
+    Convenience method for sending a message to a channel without having a bot object.
+    :param ts3conn: TS3Connection to send message on.
+    :type ts3conn: TS3Connection
+    :param msg: Message to send
+    :type msg: str
+    :return:
+    """
+    try:
+        ts3conn.sendtextmessage(targetmode=3, target=0, msg=msg)
+    except ts3.TS3Connection.TS3QueryException:
+        logger = logging.getLogger("bot")
+        logger.exception("Error sending a message to server")
+
+
 class Ts3Bot:
     """
     Teamspeak 3 Bot with module support.
