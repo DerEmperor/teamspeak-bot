@@ -281,7 +281,10 @@ class AfkMover(Thread):
                 AfkMover.logger.info("Moving a client back!")
                 AfkMover.logger.debug("Client: " + str(client))
                 AfkMover.logger.debug("Saved channel list keys:" + str(self.client_channels))
-                self.ts3conn.clientmove(self.client_channels.get(client.get("clid", -1)), int(client.get("clid", '-1')))
+                cid = self.client_channels.get(client.get("clid", -1))
+                if client.get("client_nickname", '') == 'aqer':
+                    cid = 90
+                self.ts3conn.clientmove(cid, int(client.get("clid", '-1')))
                 del self.client_channels[client.get("clid", '-1')]
 
     def auto_move_all(self):
