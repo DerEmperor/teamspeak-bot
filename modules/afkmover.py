@@ -186,7 +186,8 @@ class AfkMover(Thread):
                 if "cid" not in client.keys():
                     AfkMover.logger.error("Client without cid!")
                     AfkMover.logger.error(str(client))
-                elif client.get("client_away", '0') == '1' and int(client.get("cid", '-1')) != int(self.afk_channel):
+                elif client.get("client_away", '0') == '1' and \
+                        int(client.get("cid", '-1')) not in [int(self.afk_channel), 56, 90, 51, 88, 52]:
                     awaylist.append(client)
                 elif ("client_output_muted" in client.keys() or "client_output_hardware" in client.keys()) and \
                         int(client.get("cid", '-1')) != int(self.afk_channel):
@@ -200,7 +201,7 @@ class AfkMover(Thread):
                                 awaylist.append(client)
                         else:
                             # add to mute list
-                            if client.get('cid', -1) not in (56, 90, 51, 88, 52):
+                            if int(client.get('cid', -1)) not in (56, 90, 51, 88, 52):
                                 self.muted_since[clid] = datetime.datetime.now()
                     else:
                         # client is not muted
