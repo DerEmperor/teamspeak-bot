@@ -18,7 +18,7 @@ bot: Bot.Ts3Bot | None = None
 autoStart = True
 AFK_CHANNEL = "Bin weg"
 channel_name = AFK_CHANNEL
-MUTE_TIME = datetime.timedelta(minutes=60)
+MUTE_TIME = datetime.timedelta(minutes=45)
 
 
 @command('startafk', 'afkstart', 'afkmove', )
