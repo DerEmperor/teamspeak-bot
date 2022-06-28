@@ -250,7 +250,10 @@ class AfkMover(Thread):
             AfkMover.logger.info("Moving somebody to afk!")
             AfkMover.logger.debug("Client: " + str(client))
             try:
-                self.ts3conn.clientmove(self.afk_channel, int(client.get("clid", '-1')))
+                cid = self.afk_channel
+                if client.get("client_nickname", '').lower() in ('aqer', 'krami'):
+                    cid = 90
+                self.ts3conn.clientmove(cid, int(client.get("clid", '-1')))
             except TS3Exception:
                 AfkMover.logger.exception("Error moving client! Clid=" + str(client.get("clid", '-1')))
             self.client_channels[client.get("clid", '-1')] = client.get("cid", '0')
@@ -282,8 +285,6 @@ class AfkMover(Thread):
                 AfkMover.logger.debug("Client: " + str(client))
                 AfkMover.logger.debug("Saved channel list keys:" + str(self.client_channels))
                 cid = self.client_channels.get(client.get("clid", -1))
-                if client.get("client_nickname", '') == 'aqer':
-                    cid = 90
                 self.ts3conn.clientmove(cid, int(client.get("clid", '-1')))
                 del self.client_channels[client.get("clid", '-1')]
 
