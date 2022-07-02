@@ -195,13 +195,16 @@ class AfkMover(Thread):
                     if client["client_output_muted"] == '1' or client["client_output_hardware"] == '0':
                         # client is muted
                         if clid in self.muted_since:
-                            # still muted, but more than x minutes?
-                            if datetime.datetime.now() - self.muted_since[clid] > MUTE_TIME:
-                                # regarded as AFK
-                                awaylist.append(client)
+                            if int(client.get('cid', -1)) in (int(self.afk_channel), 56, 90, 51, 88, 52):
+                                del self.muted_since[clid]
+                            else:
+                                # still muted, but more than x minutes?
+                                if datetime.datetime.now() - self.muted_since[clid] > MUTE_TIME:
+                                    # regarded as AFK
+                                    awaylist.append(client)
                         else:
                             # add to mute list
-                            if int(client.get('cid', -1)) not in (56, 90, 51, 88, 52):
+                            if int(client.get('cid', -1)) not in (int(self.afk_channel), 56, 90, 51, 88, 52):
                                 self.muted_since[clid] = datetime.datetime.now()
                     else:
                         # client is not muted
