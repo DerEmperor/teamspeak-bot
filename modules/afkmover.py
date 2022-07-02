@@ -17,8 +17,9 @@ afkStopper = threading.Event()
 bot: Bot.Ts3Bot | None = None
 autoStart = True
 AFK_CHANNEL = "Bin weg"
-channel_name = AFK_CHANNEL
+AFK_CHANNELS = ["Masturbationszimmer", "Kramis Kühlkammer", "Anstubsbar / Anderer Gs / Zwietracht", "Vorlesung"]
 MUTE_TIME = datetime.timedelta(minutes=45)
+channel_name = AFK_CHANNEL
 
 
 @command('startafk', 'afkstart', 'afkmove', )
@@ -145,6 +146,7 @@ class AfkMover(Thread):
         self.stopped = _event
         self.ts3conn = ts3conn
         self.afk_channel = self.get_afk_channel(channel_name)
+        self.afk_channels = [self.get_afk_channel(channel) for channel in (AFK_CHANNELS + [AFK_CHANNEL])]
         self.client_channels = {}
         self.muted_since: Dict[int, datetime.datetime] = dict()
         self.afk_list = None
@@ -187,7 +189,7 @@ class AfkMover(Thread):
                     AfkMover.logger.error("Client without cid!")
                     AfkMover.logger.error(str(client))
                 elif client.get("client_away", '0') == '1' and \
-                        int(client.get("cid", '-1')) not in [int(self.afk_channel), 56, 90, 51, 88, 52]:
+                        int(client.get("cid", '-1')) not in self.afk_channels:
                     awaylist.append(client)
                 elif ("client_output_muted" in client.keys() or "client_output_hardware" in client.keys()) and \
                         int(client.get("cid", '-1')) != int(self.afk_channel):
@@ -195,7 +197,7 @@ class AfkMover(Thread):
                     if client["client_output_muted"] == '1' or client["client_output_hardware"] == '0':
                         # client is muted
                         if clid in self.muted_since:
-                            if int(client.get('cid', -1)) in (int(self.afk_channel), 56, 90, 51, 88, 52):
+                            if int(client.get('cid', -1)) in self.afk_channels:
                                 del self.muted_since[clid]
                             else:
                                 # still muted, but more than x minutes?
@@ -204,7 +206,7 @@ class AfkMover(Thread):
                                     awaylist.append(client)
                         else:
                             # add to mute list
-                            if int(client.get('cid', -1)) not in (int(self.afk_channel), 56, 90, 51, 88, 52):
+                            if int(client.get('cid', -1)) not in self.afk_channels:
                                 self.muted_since[clid] = datetime.datetime.now()
                     else:
                         # client is not muted
