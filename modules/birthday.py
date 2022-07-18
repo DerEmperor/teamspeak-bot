@@ -263,7 +263,7 @@ class BirthdayNotifier(Thread):
                 if bday.birthday == (today() + datetime.timedelta(days=1)):
                     #  tomorrow is a birthday
                     if bday.age:
-                        message = f'{bday.name} wird in {delta_to_string(delta)} {bday.age}.'
+                        message = f'{bday.name} wird in {delta_to_string(delta)} {bday.age + 1}.'
                     else:
                         message = f'{bday.name} hat in {delta_to_string(delta)} Geburtstag.'
                     send_message_to_everyone(bot.ts3conn, message)
