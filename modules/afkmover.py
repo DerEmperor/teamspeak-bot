@@ -19,7 +19,7 @@ autoStart = True
 AFK_CHANNEL = "Bin weg"
 AFK_CHANNELS = ["Masturbationszimmer", "Kramis Kühlkammer", "Anstubsbar / Anderer Gs / Zwietracht", "Vorlesung"]
 MUTE_TIME = datetime.timedelta(minutes=45)
-MUTE_TIME_WORK = datetime.timedelta(hours=2)
+MUTE_TIME_WORK = datetime.timedelta(hours=3)
 channel_name = AFK_CHANNEL
 
 
