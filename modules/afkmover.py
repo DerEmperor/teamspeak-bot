@@ -19,6 +19,7 @@ autoStart = True
 AFK_CHANNEL = "Bin weg"
 AFK_CHANNELS = ["Masturbationszimmer", "Kramis Kühlkammer", "Anstubsbar / Anderer Gs / Zwietracht", "Vorlesung"]
 MUTE_TIME = datetime.timedelta(minutes=45)
+MUTE_TIME_WORK = datetime.timedelta(hours=2)
 channel_name = AFK_CHANNEL
 
 
@@ -76,17 +77,21 @@ def get_muted_since_list(sender=None, msg=None):
 @command('getmutetime', )
 @group('Kaiser', 'Truchsess', 'Bürger', )
 def get_mute_time(sender=None, msg=None):
-    Bot.send_msg_to_client(bot.ts3conn, sender, f"mute time set to {MUTE_TIME.seconds / 60} minutes.")
+    Bot.send_msg_to_client(bot.ts3conn, sender, f"mute time set to {afkMover.mute_time.seconds / 60} minutes.")
 
 
 @command('setmutetime', )
 @group('Kaiser', 'Truchsess', )
 def set_mute_time(sender=None, msg=None):
-    global MUTE_TIME
+    global MUTE_TIME, MUTE_TIME_WORK
     _command, time = msg.split(' ')
     new_mute_time = float(time)
     if new_mute_time > 0:
-        MUTE_TIME = datetime.timedelta(minutes=new_mute_time)
+        afkMover.mute_time = datetime.timedelta(minutes=new_mute_time)
+    if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 16:
+        MUTE_TIME_WORK = new_mute_time
+    else:
+        MUTE_TIME = new_mute_time
     Bot.send_msg_to_client(bot.ts3conn, sender, f"mute time set to {new_mute_time} minutes.")
 
 
@@ -150,6 +155,7 @@ class AfkMover(Thread):
         self.client_channels = {}
         self.muted_since: Dict[int, datetime.datetime] = dict()
         self.afk_list = None
+        self.mute_time = MUTE_TIME
         if self.afk_channel is None:
             AfkMover.logger.error("Could not get afk channel")
 
@@ -201,7 +207,7 @@ class AfkMover(Thread):
                                 del self.muted_since[clid]
                             else:
                                 # still muted, but more than x minutes?
-                                if datetime.datetime.now() - self.muted_since[clid] > MUTE_TIME:
+                                if datetime.datetime.now() - self.muted_since[clid] > afkMover.mute_time:
                                     # regarded as AFK
                                     awaylist.append(client)
                         else:
@@ -298,6 +304,11 @@ class AfkMover(Thread):
         Loop move functions until the stop signal is sent.
         """
         while not self.stopped.wait(2.0):
+            if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 16:
+                self.mute_time = MUTE_TIME_WORK
+            else:
+                self.mute_time = MUTE_TIME
+
             AfkMover.logger.debug("Afkmover running!")
             self.update_afk_list()
             try:
