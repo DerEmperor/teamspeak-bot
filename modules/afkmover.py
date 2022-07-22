@@ -88,7 +88,7 @@ def set_mute_time(sender=None, msg=None):
     new_mute_time = float(time)
     if new_mute_time > 0:
         afkMover.mute_time = datetime.timedelta(minutes=new_mute_time)
-    if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 16:
+    if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 17:
         MUTE_TIME_WORK = new_mute_time
     else:
         MUTE_TIME = new_mute_time
@@ -304,7 +304,7 @@ class AfkMover(Thread):
         Loop move functions until the stop signal is sent.
         """
         while not self.stopped.wait(2.0):
-            if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 16:
+            if datetime.datetime.now().weekday() in (0, 1, 2, 3, 4) and 7 < datetime.datetime.now().hour < 17:
                 self.mute_time = MUTE_TIME_WORK
             else:
                 self.mute_time = MUTE_TIME
