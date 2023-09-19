@@ -17,7 +17,7 @@ afkStopper = threading.Event()
 bot: Bot.Ts3Bot | None = None
 autoStart = True
 AFK_CHANNEL = "Bin weg"
-AFK_CHANNELS = ["Masturbationszimmer", "Kramis Kühlkammer", "Anstubsbar / Anderer Gs / Zwietracht", "Vorlesung"]
+AFK_CHANNELS = ["Masturbationszimmer", "Kramis Kühlkammer", "Anderer Gs / Zwietracht", "Anstubsbar"]
 MUTE_TIME = datetime.timedelta(minutes=45)
 MUTE_TIME_WORK = datetime.timedelta(hours=3)
 channel_name = AFK_CHANNEL
