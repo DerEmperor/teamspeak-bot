@@ -173,7 +173,10 @@ class Birthday:
 
     @classmethod
     def from_dict(cls, d):
-        return cls(d['name'], d['birthday'], d.get('year', None), d.get('active', True))
+        year = d.get('year', None)
+        if year is not None:
+            year = int(year)
+        return cls(d['name'], d['birthday'], year, d.get('active', True))
 
     @property
     def age(self):
