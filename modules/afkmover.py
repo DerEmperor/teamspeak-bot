@@ -296,6 +296,11 @@ class AfkMover(Thread):
                 AfkMover.logger.debug("Client: " + str(client))
                 AfkMover.logger.debug("Saved channel list keys:" + str(self.client_channels))
                 cid = self.client_channels.get(client.get("clid", -1))
+                a=bot.ts3conn.channellist()
+                channels = {c.get('cid', -1): c for c in bot.ts3conn.channellist() if c.get('pid', -1) == '15'}
+                if int(channels[cid].get('total_clients', 6)) == 0:
+                    # find max
+                    cid = max(channels, key=lambda e: int(channels[e].get('total_clients', 0)))
                 self.ts3conn.clientmove(cid, int(client.get("clid", '-1')))
                 del self.client_channels[client.get("clid", '-1')]
 
