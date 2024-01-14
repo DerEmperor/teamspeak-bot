@@ -349,7 +349,7 @@ class BirthdayNotifier(Thread):
 
         age = second_next_birthday.age
         if age:
-            if next_bday.birthday > datetime.date.today():
+            if second_next_birthday.birthday > datetime.date.today():
                 second_next_birthday_name += f' ({age + 1})'
             else:
                 second_next_birthday_name += f' ({age})'
