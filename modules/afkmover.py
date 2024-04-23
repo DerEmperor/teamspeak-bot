@@ -301,8 +301,8 @@ class AfkMover(Thread):
                 if int(channels[cid].get('total_clients', 1)) == 0:
                     # find max
                     cid = max(channels, key=lambda e: int(channels[e].get('total_clients', 0)))
-                    if channels[cid].get('total_clients', 0) == 0:
-                        cid = random.choice([channels.keys()])
+                    if int(channels[cid].get('total_clients', 1)) == 0:
+                        cid = random.choice(list(channels.keys()))
                 self.ts3conn.clientmove(cid, int(client.get("clid", '-1')))
                 del self.client_channels[client.get("clid", '-1')]
 
