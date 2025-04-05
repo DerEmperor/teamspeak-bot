@@ -64,7 +64,7 @@ def get_afk_list(sender=None, msg=None):
         Bot.send_msg_to_client(bot.ts3conn, sender, str(afkMover.client_channels))
 
 
-@command('getmutedsincelist', )
+@command('getmutedsincelist', 'muted')
 @group('Kaiser', 'Truchsess', 'Bürger')
 def get_muted_since_list(sender=None, msg=None):
     if afkMover is not None:
