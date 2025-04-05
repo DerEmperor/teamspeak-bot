@@ -35,9 +35,11 @@ def start_afkmover(sender=None, msg=None):
         afkMover = AfkMover(afkStopper, bot.ts3conn)
         afkStopper.clear()
         afkMover.start()
-        Bot.send_msg_to_client(bot.ts3conn, sender, "AFK mover started.")
+        if sender is not None:
+            Bot.send_msg_to_client(bot.ts3conn, sender, "AFK mover started.")
     else:
-        Bot.send_msg_to_client(bot.ts3conn, sender, "AFK already running.")
+        if sender is not None:
+            Bot.send_msg_to_client(bot.ts3conn, sender, "AFK already running.")
 
 
 @command('stopafk', 'afkstop')
