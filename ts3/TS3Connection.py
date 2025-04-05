@@ -162,7 +162,9 @@ class TS3Connection:
                                 if resp[1] != b'id=0':
                                     raise TS3QueryException(
                                         int(resp[1].decode(encoding='UTF-8').split("=", 1)[1]),
-                                        resp[2].decode(encoding='UTF-8').split("=", 1)[1])
+                                        resp[2].decode(encoding='UTF-8').split("=", 1)[1],
+                                        query.decode(),
+                                    )
                             else:
                                 self._logger.debug("Resp: %s", str(resp))
                                 saved_resp += resp
@@ -648,18 +650,20 @@ class TS3QueryException(TS3Exception):
     Query exception class to signalize failed queries and connection errors.
     """
 
-    def __init__(self, error_id, message):
+    def __init__(self, error_id, message, query):
         """
         Creates a new QueryException.
         :param error_id: Id of the error.
         :param message: Error message.
+        :param query: Query string.
         :type error_id: int
         :type message: str
+        :type query: str
         """
         self._type = TS3QueryExceptionType(error_id)
         self._msg = utilities.unescape(message)
         super(TS3QueryException, self).__init__(
-            "Query failed with id=" + str(error_id) + " msg=" + str(self._msg))
+            "Query failed with id=" + str(error_id) + " msg=" + str(self._msg) + " query=" + query)
 
     @property
     def message(self):
