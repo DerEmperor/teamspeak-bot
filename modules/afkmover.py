@@ -107,8 +107,8 @@ def client_left(_event):
     if afkMover is not None:
         if str(_event.client_id) in afkMover.client_channels:
             del afkMover.client_channels[str(_event.client_id)]
-        if _event.client_id in afkMover.muted_since:
-            del afkMover.muted_since[_event.client_id]
+        if str(_event.client_id) in afkMover.muted_since:
+            del afkMover.muted_since[str(_event.client_id)]
 
 
 @setup
@@ -156,7 +156,7 @@ class AfkMover(Thread):
         self.afk_channel = self.get_afk_channel(channel_name)
         self.afk_channels = [self.get_afk_channel(channel) for channel in (AFK_CHANNELS + [AFK_CHANNEL])]
         self.client_channels = {}
-        self.muted_since: Dict[int, datetime.datetime] = dict()
+        self.muted_since: Dict[str, datetime.datetime] = dict()
         self.afk_list = None
         self.mute_time = MUTE_TIME
         if self.afk_channel is None:
