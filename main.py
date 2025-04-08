@@ -61,6 +61,7 @@ def main():
         file_handler.setFormatter(formatter)
         logger.addHandler(file_handler)
         logger.info('Started')
+        logger.info('python version: %s', sys.version)
     sys.excepthook = exception_handler
     config = Bot.Ts3Bot.parse_config(logger)
     bot = Bot.Ts3Bot.bot_from_config(config)
