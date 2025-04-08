@@ -306,9 +306,23 @@ class TS3Connection:
             for event in Events.text_events:
                 blinker.signal(event.name + "_private").connect(event_listener, weak=weak_ref)
 
+    def set_channel_name_and_description(self, cid, name, description):
+        try:
+            self._send("channeledit", [f"cid={cid}", f"channel_name={name}", f"channel_description={description}"])
+        except TS3QueryException as ex:
+            if ex.id != 771:
+                raise ex
+
     def set_channel_name(self, cid, name):
         try:
             self._send("channeledit", [f"cid={cid}", f"channel_name={name}"])
+        except TS3QueryException as ex:
+            if ex.id != 771:
+                raise ex
+
+    def set_channel_description(self, cid, description):
+        try:
+            self._send("channeledit", [f"cid={cid}", f"channel_description={description}"])
         except TS3QueryException as ex:
             if ex.id != 771:
                 raise ex
@@ -617,6 +631,9 @@ class TS3Connection:
         :return:
         """
         threading.Thread(target=self.keepalive_loop, args=(interval,)).start()
+        # keep alive, because otherwise the lol_bot crashed with
+        # RuntimeError: can't register atexit after shutdown
+        threading.Event().wait()
 
     def __getattr__(self, item):
         """
