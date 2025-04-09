@@ -91,11 +91,10 @@ def translate_lol_mode(game_mode: str, game_type: str) -> str:
 class LolRank(Enum):
     IRON = 'IRON'
     BRONZE = 'BRONZE'
-    COPPER = 'COPPER'
     SILVER = 'SILVER'
     GOLD = 'GOLD'
-    EMERALD = 'EMERALD'
     PLATINUM = 'PLATINUM'
+    EMERALD = 'EMERALD'
     DIAMOND = 'DIAMOND'
     MASTER = 'MASTER'
 
