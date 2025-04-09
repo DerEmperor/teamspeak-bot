@@ -5,7 +5,6 @@ from dataclasses import dataclass
 from os import environ
 from enum import Enum
 from typing import List, Dict, Tuple, Any
-import json
 import logging
 
 import requests
