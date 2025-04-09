@@ -300,5 +300,4 @@ class LolBot(Thread):
             await self.update_ranks_scheduled()
             games = await self.get_games()
             await self.update_games_channels(games)
-            print('updated')
             run_time = time.time() - start
