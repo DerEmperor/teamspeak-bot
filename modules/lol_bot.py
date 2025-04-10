@@ -253,7 +253,12 @@ class LolBot(Thread):
             LolBot.logger.warning('too many games: %i', len(games))
         for game, cid in zip(games, LOL_CHANNEL_IDS):
             game: LolGame = game
-            new_channel_name = f'[lspacer]{game.mode}: {game.time // 60} min; '  # + names
+            if game.time == -1:
+                game_time = 'loading'
+            else:
+                game_time = f"{game.time // 60}min"
+
+            new_channel_name = f'[lspacer]{game.mode}: {game_time}: '  # + names
 
             names = ','.join([p.irl_name for p in game.ts_participants])
             remaining_chars = 40 - len(new_channel_name)
@@ -273,10 +278,16 @@ class LolBot(Thread):
 
             participants_formatted = participants_formatted[:-len(team_sep)]
 
+            if game.time == -1:
+                game_time = 'loading'
+            else:
+                game_time = f"{game.time // 60}:{game.time % 60} min"
+
+
             new_channel_description = (
                 f"ID:{game.game_id} \n"
                 f"mode: {game.mode} \n"
-                f"time: {game.time // 60}:{game.time % 60} min\n"
+                f"time: {game_time}\n"
                 f"banned champions: {', '.join(game.banned_champions)} \n"
                 f"\n"
                 f"{participants_formatted}"
