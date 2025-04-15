@@ -281,7 +281,7 @@ class LolBot(Thread):
             if game.time == -1:
                 game_time = 'loading'
             else:
-                game_time = f"{game.time // 60}:{game.time % 60} min"
+                game_time = f"{game.time // 60}:{(game.time % 60):02d} min"
 
 
             new_channel_description = (
