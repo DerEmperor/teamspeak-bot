@@ -43,6 +43,7 @@ logger.propagate = 0
 LOL_GAME_MODES: Dict[Tuple[str, str], str] = {
     ('ARAM', 'MATCHED'): 'ARAM',
     ('CHERRY', 'MATCHED'): 'Arena',
+    ('CLASSIC', 'MATCHED'): 'Classic',
 }
 
 
