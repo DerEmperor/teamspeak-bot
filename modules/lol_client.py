@@ -263,7 +263,7 @@ class LolUser:
 
         return LolGame(
             game_id=game['gameId'],
-            mode=translate_lol_mode(game['gameMode'], game['gameType']),
+            mode=translate_lol_mode(game['gameMode'], game['gameType'], game['gameQueueConfigId']),
             time=game['gameLength'],
             ts_participants=ts_participants,
             lol_participants=lol_participants,
