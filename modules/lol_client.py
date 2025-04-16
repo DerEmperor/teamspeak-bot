@@ -14,7 +14,7 @@ from pulsefire.clients import RiotAPIClient
 # get latest version
 response = requests.get("https://ddragon.leagueoflegends.com/api/versions.json")
 assert response.status_code == 200
-latest=response.json()[0]
+latest = response.json()[0]
 
 # get champions
 response = requests.get(f"https://ddragon.leagueoflegends.com/cdn/{latest}/data/en_US/champion.json")
@@ -40,10 +40,20 @@ logger.addHandler(file_handler)
 logger.info("Configured LoL Client logger")
 logger.propagate = 0
 
-LOL_GAME_MODES: Dict[Tuple[str, str], str] = {
-    ('ARAM', 'MATCHED'): 'ARAM',
-    ('CHERRY', 'MATCHED'): 'Arena',
-    ('CLASSIC', 'MATCHED'): 'Classic',
+LOL_GAME_MODES: Dict[int, str] = {
+    76: 'URF',
+    400: 'Draft Pick',
+    420: 'Ranked',
+    430: 'Blind pick',
+    440: 'Flex',
+    450: 'ARAM',
+    490: 'Normal',
+    700: 'Clash',
+    720: 'ARAM Clash',
+    900: 'ARURF',
+    1700: 'Arena',
+    1710: 'Arena',
+    1900: 'URF Pick',
 }
 
 
@@ -81,12 +91,13 @@ class GameParticipant:
         return [self.name, self.champion, self.spell1, self.spell2, 'bot' if self.bot else '']
 
 
-def translate_lol_mode(game_mode: str, game_type: str) -> str:
-    if (game_mode, game_type) in LOL_GAME_MODES:
-        return LOL_GAME_MODES[(game_mode, game_type)]
+def translate_lol_mode(game_mode: str, game_type: str, queue_id: int) -> str:
+    if queue_id in LOL_GAME_MODES:
+        logger.warning("Game in Config: %s-%s-%i: %s", game_mode, game_type, queue_id, LOL_GAME_MODES[queue_id])
+        return LOL_GAME_MODES[queue_id]
     else:
-        logger.warning("Missing Game in Config: %s-%s", game_mode, game_type)
-        return f'{game_mode}-{game_type}'
+        logger.warning("Missing Game in Config: %s-%s-%i", game_mode, game_type, queue_id)
+        return game_mode.lower()
 
 
 class LolRank(Enum):
