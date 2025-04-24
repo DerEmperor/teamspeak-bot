@@ -40,20 +40,36 @@ logger.addHandler(file_handler)
 logger.info("Configured LoL Client logger")
 logger.propagate = 0
 
+# https://static.developer.riotgames.com/docs/lol/queues.json
 LOL_GAME_MODES: Dict[int, str] = {
+    0: 'Custom',
     76: 'URF',
-    400: 'Draft Pick',
-    420: 'Ranked',
-    430: 'Blind pick',
-    440: 'Flex',
+    83: 'URFvsAI',
+    100: 'ARAM Event',
+    325: 'AllRandom',
+    400: 'DraftPick',
+    420: 'RankedSolo',
+    430: 'BlindPick',
+    440: 'RankedFlex',
     450: 'ARAM',
     490: 'Normal',
     700: 'Clash',
-    720: 'ARAM Clash',
-    900: 'ARURF',
+    720: 'ClashARAM',
+    820: 'vs AI Beg',
+    870: 'vs AI Intro',
+    880: 'vs AI Beg',
+    890: 'vs AI Med',
+    1090: 'TFT Quick',
+    1100: 'TFT Ranked',
+    1110: 'TFT Tutorial',
+    1111: 'TFT Test',
+    1210: 'TFT Treasure',
     1700: 'Arena',
     1710: 'Arena',
     1900: 'URF Pick',
+    2000: 'Tutorial1',
+    2010: 'Tutorial2',
+    2020: 'Tutorial3',
 }
 
 
@@ -92,9 +108,20 @@ class GameParticipant:
 
 
 def translate_lol_mode(game_mode: str, game_type: str, queue_id: int) -> str:
+    # https://static.developer.riotgames.com/docs/lol/gameModes.json and CHERRY?
+    # https://static.developer.riotgames.com/docs/lol/gameTypes.json
+    # https://static.developer.riotgames.com/docs/lol/queues.json
     if queue_id in LOL_GAME_MODES:
-        logger.warning("Game in Config: %s-%s-%i: %s", game_mode, game_type, queue_id, LOL_GAME_MODES[queue_id])
-        return LOL_GAME_MODES[queue_id]
+        res = LOL_GAME_MODES[queue_id]
+        if game_type == 'CUSTOM':
+            res += ' Custom'
+        elif game_type == 'TUTORIAL':
+            res += ' Tut'
+        elif game_type == 'MATCHED':
+            pass
+        else:
+            logger.error(f'Unknown game mode {game_type}')
+        return res
     else:
         logger.warning("Missing Game in Config: %s-%s-%i", game_mode, game_type, queue_id)
         return game_mode.lower()

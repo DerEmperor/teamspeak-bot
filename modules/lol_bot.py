@@ -18,6 +18,7 @@ from ts3.TS3Connection import TS3Connection
 
 LOL_CHANNEL_IDS = [104, 105]
 LOL_DATA_FILE = 'lol_names.json'
+MAX_CHANNEL_LEN = 40
 
 lol_bot: LolBot | None = None
 lolStopper = threading.Event()
@@ -261,13 +262,31 @@ class LolBot(Thread):
             new_channel_name = f'[lspacer]{game.mode}: {game_time}: '  # + names
 
             names = ','.join([p.irl_name for p in game.ts_participants])
-            remaining_chars = 40 - len(new_channel_name)
+            remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+            if remaining_chars < 0:
+                logger.warning('channel name too long: %s', new_channel_name)
+                new_channel_name = f'[lspacer]{game_time}: '
+                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+            if remaining_chars < 10:
+                new_channel_name = f'[lspacer]{game.mode}: '
+                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+            if remaining_chars < 10:
+                new_channel_name = f'[lspacer]game: '
+                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
             if len(names) > remaining_chars:
                 max_len = 10
                 while len(names) > remaining_chars:
                     names = ','.join([p.irl_name[:max_len] for p in game.ts_participants])
                     max_len -= 1
-            new_channel_name = new_channel_name + names
+            if len(names) > remaining_chars:
+                names = ''.join([p.irl_name[0] for p in game.ts_participants])
+            if len(names) > remaining_chars:
+                new_channel_name = f'[lspacer] {game.mode}: '
+                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+            if len(names) <= remaining_chars:
+                new_channel_name = new_channel_name + names
+            else:
+                new_channel_name = new_channel_name[:-2]  # cut off ': '
 
             team_sep = '------------ vs ------------\n'
             participants_formatted = ''
