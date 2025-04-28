@@ -114,13 +114,17 @@ def multi_move(sender, msg):
 def send_message_to_everyone(conn, message):
     client_list = conn.clientlist()
     for client in client_list:
-        Bot.send_msg_to_client(conn, client.get("clid", '-1'), message)
+        if client.get("client_type", '1') == '0':
+            # don't message ServerQuery clients
+            Bot.send_msg_to_client(conn, client.get("clid", '-1'), message)
 
 
 def poke_message_to_everyone(conn, message):
     client_list = conn.clientlist()
     for client in client_list:
-        Bot.poke_msg_to_client(conn, client.get("clid", '-1'), message)
+        if client.get("client_type", '1') == '0':
+            # don't poke ServerQuery clients
+            Bot.poke_msg_to_client(conn, client.get("clid", '-1'), message)
 
 
 @command('pokeeveryone', )
