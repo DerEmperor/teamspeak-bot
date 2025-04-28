@@ -43,9 +43,9 @@ def kickme(sender, msg):
     ts3conn.clientkick(sender, 5, "Whatever.")
 
 
-@command('mtest', )
+@command('findchannel', 'mtest')
 @group('Kaiser', )
-def mtest(sender, msg):
+def find_channel(sender, msg):
     channels = split_command(msg)[1:]
     ts3conn = bot.ts3conn
     answer = [ts3conn.channelfind(channel) for channel in channels]
