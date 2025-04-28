@@ -254,10 +254,7 @@ class LolBot(Thread):
             LolBot.logger.warning('too many games: %i', len(games))
         for game, cid in zip(games, LOL_CHANNEL_IDS):
             game: LolGame = game
-            if game.time == -1:
-                game_time = 'loading'
-            else:
-                game_time = f"{game.time // 60}min"
+            game_time = f"{game.time // 60}min"
 
             new_channel_name = f'[lspacer]{game.mode}: {game_time}: '  # + names
 
@@ -296,12 +293,7 @@ class LolBot(Thread):
                 participants_formatted += team_sep
 
             participants_formatted = participants_formatted[:-len(team_sep)]
-
-            if game.time == -1:
-                game_time = 'loading'
-            else:
-                game_time = f"{game.time // 60}:{(game.time % 60):02d} min"
-
+            game_time = f"{game.time // 60}:{(game.time % 60):02d} min"
 
             new_channel_description = (
                 f"ID:{game.game_id} \n"
