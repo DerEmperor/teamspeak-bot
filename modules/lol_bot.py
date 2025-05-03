@@ -16,7 +16,6 @@ import Bot
 from modules.lol_client import LolUser, LolGame, LolRank
 from ts3.TS3Connection import TS3Connection
 
-LOL_CHANNEL_IDS = [104, 105]
 LOL_DATA_FILE = 'lol_names.json'
 MAX_CHANNEL_LEN = 40
 
@@ -34,6 +33,33 @@ LOL_RANK_NAMES_TO_SERVER_GROUP_NAMES = {
     LolRank.EMERALD: 'Smaragd',
     LolRank.DIAMOND: 'Diamant',
     LolRank.MASTER: 'Meister',
+}
+LOL_CHANNEL_ATTRS = {
+    "pid": "80",
+    "channel_name": "[cspacer]TEST",
+    "channel_description": 'foo',
+    "channel_maxclients": "0",
+    'channel_maxfamilyclients': '-1',
+    'channel_flag_maxclients_unlimited': '0',
+    'channel_flag_maxfamilyclients_unlimited': '0',
+    'channel_flag_maxfamilyclients_inherited': '1',
+    "channel_order": "106",
+    "channel_flag_permanent": "1",
+    "channel_flag_password": "0",
+    "channel_needed_talk_power": "0",
+}
+LOL_CHANNEL_PERMS = {
+    86:75,  # Use channel commander
+    125:75,  # Modify
+    133:75,  # Delete
+    140:75,  # Join
+    142:75,  # Subscribe
+    144:50,  # view description
+    236:75,  # Upload
+    238:75,  # Download
+    242:75,  # Rename
+    244:75,  # Browse
+    246:75,  # Dir create
 }
 
 
@@ -165,6 +191,7 @@ class LolBot(Thread):
         self.lol_rank_to_server_group_id: Dict[LolRank, int] = self.init_lol_rank_to_server_group_id()
         self.rank_updated = False
         self.active_games = []
+        self.lol_channel_ids: List[int] = []
 
     def run(self):
         """
@@ -252,65 +279,87 @@ class LolBot(Thread):
         games = set(games) - {None}  # eliminate doubles
         return list(games)
 
-    async def update_games_channels(self, games: List[LolGame]):
-        if len(games) > 2:
-            LolBot.logger.warning('too many games: %i', len(games))
-        for game, cid in zip(games, LOL_CHANNEL_IDS):
-            game: LolGame = game
-            game_time = f"{game.time // 60}min"
+    @staticmethod
+    def get_lol_channel_name(game: LolGame, cnt:int) -> str:
+        game: LolGame = game
+        game_time = f"{game.time // 60}min"
 
-            new_channel_name = f'[lspacer]{game.mode}: {game_time}: '  # + names
+        new_channel_name = f'[lspacer{cnt}]{game.mode}: {game_time}: '  # + names
 
-            names = ','.join([p.irl_name for p in game.ts_participants])
+        names = ','.join([p.irl_name for p in game.ts_participants])
+        remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+        if remaining_chars < 0:
+            logger.warning('channel name too long: %s', new_channel_name)
+            new_channel_name = f'[lspacer]{game_time}: '
             remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-            if remaining_chars < 0:
-                logger.warning('channel name too long: %s', new_channel_name)
-                new_channel_name = f'[lspacer]{game_time}: '
-                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-            if remaining_chars < 10:
-                new_channel_name = f'[lspacer]{game.mode}: '
-                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-            if remaining_chars < 10:
-                new_channel_name = f'[lspacer]game: '
-                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-            if len(names) > remaining_chars:
-                max_len = 10
-                while len(names) > remaining_chars:
-                    names = ','.join([p.irl_name[:max_len] for p in game.ts_participants])
-                    max_len -= 1
-            if len(names) > remaining_chars:
-                names = ''.join([p.irl_name[0] for p in game.ts_participants])
-            if len(names) > remaining_chars:
-                new_channel_name = f'[lspacer] {game.mode}: '
-                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-            if len(names) <= remaining_chars:
-                new_channel_name = new_channel_name + names
-            else:
-                new_channel_name = new_channel_name[:-2]  # cut off ': '
+        if remaining_chars < 10:
+            new_channel_name = f'[lspacer]{game.mode}: '
+            remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+        if remaining_chars < 10:
+            new_channel_name = f'[lspacer]game: '
+            remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+        if len(names) > remaining_chars:
+            max_len = 10
+            while len(names) > remaining_chars:
+                names = ','.join([p.irl_name[:max_len] for p in game.ts_participants])
+                max_len -= 1
+        if len(names) > remaining_chars:
+            names = ''.join([p.irl_name[0] for p in game.ts_participants])
+        if len(names) > remaining_chars:
+            new_channel_name = f'[lspacer] {game.mode}: '
+            remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+        if len(names) <= remaining_chars:
+            new_channel_name = new_channel_name + names
+        else:
+            new_channel_name = new_channel_name[:-2]  # cut off ': '
 
-            team_sep = '------------ vs ------------\n'
-            participants_formatted = ''
-            for team in game.lol_participants.values():
-                for participant in team:
-                    participants_formatted += participant.get_description() + '\n'
-                participants_formatted += team_sep
+        return new_channel_name
 
-            participants_formatted = participants_formatted[:-len(team_sep)]
-            game_time = f"{game.time // 60}:{(game.time % 60):02d} min"
+    @staticmethod
+    def get_lol_channel_description(game: LolGame) -> str:
+        team_sep = '------------ vs ------------\n'
+        participants_formatted = ''
+        for team in game.lol_participants.values():
+            for participant in team:
+                participants_formatted += participant.get_description() + '\n'
+            participants_formatted += team_sep
 
-            new_channel_description = (
-                f"ID:{game.game_id} \n"
-                f"mode: {game.mode} \n"
-                f"time: {game_time}\n"
-                f"banned champions: {', '.join(game.banned_champions)} \n"
-                f"\n"
-                f"{participants_formatted}"
-            )
+        participants_formatted = participants_formatted[:-len(team_sep)]
+        game_time = f"{game.time // 60}:{(game.time % 60):02d} min"
+
+        new_channel_description = (
+            f"ID:{game.game_id} \n"
+            f"mode: {game.mode} \n"
+            f"time: {game_time}\n"
+            f"banned champions: {', '.join(game.banned_champions)} \n"
+            f"\n"
+            f"{participants_formatted}"
+        )
+        return new_channel_description
+
+    async def update_games_channels(self, games: List[LolGame]):
+        # delete additional channels
+        while len(games) < len(self.lol_channel_ids):
+            cid = self.lol_channel_ids.pop()
+            bot.ts3conn.channel_delete(cid)
+
+        cnt = 1  # prevent same channel names while updating channels
+        # update existing channels
+        for game, cid in zip(games, self.lol_channel_ids):
+            new_channel_description = self.get_lol_channel_description(game)
+            new_channel_name = self.get_lol_channel_name(game, cnt)
+            cnt += 1
             self.ts3conn.set_channel_name_and_description(cid, new_channel_name, new_channel_description)
 
-        # clear remaining channels
-        for cid in LOL_CHANNEL_IDS[len(games):]:
-            self.ts3conn.set_channel_name_and_description(cid, f'[lspacer{cid}]', '')
+        # create new channel for remaining games
+        todo = games[len(self.lol_channel_ids):]
+        for game in todo:
+            new_channel_description = self.get_lol_channel_description(game)
+            new_channel_name = self.get_lol_channel_name(game, cnt)
+            cnt += 1
+            cid = bot.ts3conn.create_channel_with_permissions(LOL_CHANNEL_ATTRS, LOL_CHANNEL_PERMS)
+            self.lol_channel_ids.append(cid)
+            self.ts3conn.set_channel_name_and_description(cid, new_channel_name, new_channel_description)
 
     async def main(self):
         """
