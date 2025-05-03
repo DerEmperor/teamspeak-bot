@@ -1,10 +1,10 @@
 from __future__ import annotations
 
+from random import shuffle
+
 from Moduleloader import *
 import Moduleloader
 import Bot
-import logging
-from random import shuffle
 from ts3.TS3Connection import TS3QueryException
 
 __version__ = "0.4"
@@ -36,6 +36,14 @@ def hello(sender, msg):
     Bot.send_msg_to_client(bot.ts3conn, sender, "Hello citizen!")
 
 
+@command('channelinfo', )
+@group('Kaiser', )
+def hello(sender, msg):
+    cid = msg.split(' ')[1]
+    res = bot.ts3conn.channelinfo(cid=cid)
+    Bot.send_msg_to_client(bot.ts3conn, sender, res)
+
+
 @command('kickme', 'fuckme')
 @group('.*', )
 def kickme(sender, msg):
@@ -44,7 +52,7 @@ def kickme(sender, msg):
 
 
 @command('findchannel', 'mtest')
-@group('Kaiser', )
+@group('.*', )
 def find_channel(sender, msg):
     channels = split_command(msg)[1:]
     ts3conn = bot.ts3conn
@@ -239,7 +247,7 @@ def maketeams(sender, msg):
             players.append(client.get('client_nickname', client.get('clid', -1)))
 
     shuffle(players)
-    teams = [[] for i in range(number_of_teams)]
+    teams = [[] for _ in range(number_of_teams)]
     for i, player in enumerate(players):
         teams[i % number_of_teams].append(player)
 
