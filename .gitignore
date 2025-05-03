@@ -5,6 +5,7 @@ __conn_settings__.py
 *.log.*
 *.pyc
 *__pycache__/
+venv
 quotes
 main.sh
 .viminfo
@@ -20,3 +21,4 @@ Test.py
 tests.py
 birthdays.json
 lol_names.json
+old_logs.txt
