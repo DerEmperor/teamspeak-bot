@@ -312,6 +312,29 @@ class TS3Connection:
             for event in Events.text_events:
                 blinker.signal(event.name + "_private").connect(event_listener, weak=weak_ref)
 
+    def channel_delete(self, cid: int | str, force: bool = True):
+        self._send("channeldelete", [f"cid={cid}", f"force={1 if force else 0}"])
+
+    def create_channel_with_permissions(self, channel_attributes: Dict[str, str | int], permissions: Dict[int, int]):
+        """permissions: {permid: permvalue}, return channel id"""
+        cid = self.channel_create(**channel_attributes)
+        parsed_perms = []
+        for perm_id, perm_value in permissions.items():
+            parsed_perms.append({'cid': cid, 'permid': perm_id, 'permvalue': perm_value})
+        self.set_channel_permissions(parsed_perms)
+        return cid
+
+    def set_channel_permissions(self, permissions: List[Dict[str, str | int]]):
+        """permission: {'cid':{cid}, 'permid':{permid}, 'permvalue':{permvalue}}"""
+        arg_group = [[f"{k}={v}" for k, v in perm.items()] for perm in permissions]
+        self._send("channeladdperm", args_group=arg_group)
+
+    def channel_create(self, **attributes) -> int:
+        """create channel, return channel id"""
+        resp = self._send("channelcreate", [f"{k}={v}" for k, v in attributes.items()])
+        parsed_resp = self._parse_resp_to_list_of_dicts(resp)
+        return int(parsed_resp[0]['cid'])
+
     def set_channel_name_and_description(self, cid, name, description):
         try:
             self._send("channeledit", [f"cid={cid}", f"channel_name={name}", f"channel_description={description}"])
