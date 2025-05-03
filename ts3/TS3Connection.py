@@ -6,6 +6,7 @@ import telnetlib
 import threading
 import time
 import traceback
+from typing import List, Dict
 
 import blinker
 
@@ -113,10 +114,11 @@ class TS3Connection:
             self._logger.warning("Clientlist empty %s", str(clist))
         return clients
 
-    def _send(self, command, args=None, wait_for_resp=True, log_keepalive=False):
+    def _send(self, command, args=None, args_group=None, wait_for_resp=True, log_keepalive=False):
         """
         :param command: Command to send.
         :param args: Parameter to send, will be escaped.
+        :param args_group: Command group to send (separated by |), will be escaped.
         :param wait_for_resp: True: Expects at least a error line and blocks until one is received.
                               False: Almost exclusively for keepalive, doesn't wait for an
                                      acknowledgment.
@@ -125,16 +127,20 @@ class TS3Connection:
         :rtype: bytes | None
         :type command: str
         :type args: list[str]
+        :type args_group: list[list[str]]
         :type wait_for_resp: bool
         :type log_keepalive: bool
         """
         query = command
         saved_resp = b''
         ack = False
-        if args is None:
-            args = []
-        for arg in args:
-            query += " " + utilities.escape(arg)
+        if args and args_group:
+            raise ValueError("don't use args and args_group")
+        if args_group:
+            query += " " + '|'.join([' '.join([utilities.escape(arg) for arg in args]) for args in args_group])
+        else:
+            for arg in args or []:
+                query += " " + utilities.escape(arg)
         query += "\n\r"
         query = query.encode()
         resp = None
@@ -443,9 +449,9 @@ class TS3Connection:
 
     def channel_name_list(self):
         """
-                    Returns a liszt of channel names. (Convenience Wrapper around channellist)
-                    :return:  List of channel names
-                  """
+        Returns a list of channel names. (Convenience Wrapper around channellist)
+        :return:  List of channel names
+        """
         names = list()
         channels = self.channellist()
         for channel in channels:
