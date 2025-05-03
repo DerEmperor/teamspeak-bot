@@ -229,16 +229,19 @@ class LolBot(Thread):
                     if right_rank_ts is not None:
                         self.ts3conn.servergroupaddclient(sgid=right_rank_ts, cldbid=cldbid)
 
-    async def update_ranks_scheduled(self) -> None:
-        """update ranks at 5 o'clock"""
+    async def update_ranks_scheduled(self) -> bool:
+        """update ranks at 5 o'clock, return True if ranks were updated"""
         hour = datetime.now().hour
         if hour == 0:
             self.rank_updated = False
+            return False
         elif not self.rank_updated and hour == 5:
             self.logger.warning('update ranks')
             LolGame.clear_cache()
             await self.update_ranks()
             self.rank_updated = True
+            return True
+        return False
 
     async def get_games(self) -> List[LolGame]:
         cors = []
@@ -319,7 +322,8 @@ class LolBot(Thread):
         while not self.stopped.wait(max(0, 30 - run_time)):
             start = time.time()
             self.logger.debug("LoLBot running!")
-            await self.update_ranks_scheduled()
-            games = await self.get_games()
-            await self.update_games_channels(games)
+            if not await self.update_ranks_scheduled():
+                # don't update games if ranks were updated to prevent sending too many requests
+                games = await self.get_games()
+                await self.update_games_channels(games)
             run_time = time.time() - start
