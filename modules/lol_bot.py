@@ -357,7 +357,7 @@ class LolBot(Thread):
             channel_attrs = LOL_CHANNEL_ATTRS.copy()
             channel_attrs['channel_name'] = self.get_lol_channel_name(game, cnt)
             channel_attrs['channel_description'] = self.get_lol_channel_description(game)
-            cid = bot.ts3conn.create_channel_with_permissions(LOL_CHANNEL_ATTRS, LOL_CHANNEL_PERMS)
+            cid = bot.ts3conn.create_channel_with_permissions(channel_attrs, LOL_CHANNEL_PERMS)
             self.lol_channel_ids.append(cid)
             cnt += 1
 
