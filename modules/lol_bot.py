@@ -53,7 +53,7 @@ LOL_CHANNEL_PERMS = {
     125:75,  # Modify
     133:75,  # Delete
     140:75,  # Join
-    142:75,  # Subscribe
+    142:50,  # Subscribe
     144:50,  # view description
     236:75,  # Upload
     238:75,  # Download
