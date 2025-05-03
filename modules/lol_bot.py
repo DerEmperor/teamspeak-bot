@@ -36,8 +36,8 @@ LOL_RANK_NAMES_TO_SERVER_GROUP_NAMES = {
 }
 LOL_CHANNEL_ATTRS = {
     "pid": "80",
-    "channel_name": "[cspacer]TEST",
-    "channel_description": 'foo',
+    "channel_name": "[cspacer]Name",
+    "channel_description": 'description',
     "channel_maxclients": "0",
     'channel_maxfamilyclients': '-1',
     'channel_flag_maxclients_unlimited': '0',
@@ -354,12 +354,12 @@ class LolBot(Thread):
         # create new channel for remaining games
         todo = games[len(self.lol_channel_ids):]
         for game in todo:
-            new_channel_description = self.get_lol_channel_description(game)
-            new_channel_name = self.get_lol_channel_name(game, cnt)
-            cnt += 1
+            channel_attrs = LOL_CHANNEL_ATTRS.copy()
+            channel_attrs['channel_name'] = self.get_lol_channel_name(game, cnt)
+            channel_attrs['channel_description'] = self.get_lol_channel_description(game)
             cid = bot.ts3conn.create_channel_with_permissions(LOL_CHANNEL_ATTRS, LOL_CHANNEL_PERMS)
             self.lol_channel_ids.append(cid)
-            self.ts3conn.set_channel_name_and_description(cid, new_channel_name, new_channel_description)
+            cnt += 1
 
     async def main(self):
         """
