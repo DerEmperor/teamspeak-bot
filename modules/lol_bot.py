@@ -289,25 +289,23 @@ class LolBot(Thread):
         names = ','.join([p.irl_name for p in game.ts_participants])
         remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
         if remaining_chars < 0:
-            logger.warning('channel name too long: %s', new_channel_name)
-            new_channel_name = f'[lspacer]{game_time} '
+            new_channel_name = f'[lspacer{cnt}]{game_time} '
             remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
         if remaining_chars < 10:
-            new_channel_name = f'[lspacer]{game.mode} '
+            new_channel_name = f'[lspacer{cnt}]{game.mode} '
             remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
-        if remaining_chars < 10:
-            new_channel_name = f'[lspacer]game '
-            remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+            if remaining_chars < 10:
+                new_channel_name = f'[lspacer{cnt}]game '
+                remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
         if len(names) > remaining_chars:
             max_len = 10
-            while len(names) > remaining_chars:
+            while len(names) > remaining_chars and max_len > 2:
                 names = ','.join([p.irl_name[:max_len] for p in game.ts_participants])
                 max_len -= 1
         if len(names) > remaining_chars:
-            names = ''.join([p.irl_name[0] for p in game.ts_participants])
-        if len(names) > remaining_chars:
-            new_channel_name = f'[lspacer] {game.mode} '
+            new_channel_name = f'[lspacer{cnt}]{game.mode} '
             remaining_chars = MAX_CHANNEL_LEN - len(new_channel_name)
+
         if len(names) <= remaining_chars:
             new_channel_name = new_channel_name + names
         else:
