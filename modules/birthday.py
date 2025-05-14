@@ -222,7 +222,7 @@ class BirthdayNotifier(Thread):
     logger = logging.getLogger("birthday")
     logger.propagate = 0
     logger.setLevel(logging.WARNING)
-    file_handler = logging.FileHandler("birthday.log", mode='a+')
+    file_handler = logging.FileHandler("logs/birthday.log", mode='a+')
     formatter = logging.Formatter('birthday Logger %(asctime)s %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)

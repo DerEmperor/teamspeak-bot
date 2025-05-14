@@ -10,7 +10,7 @@ class EventHandler(object):
     """
     logger = logging.getLogger("eventhandler")
     logger.setLevel(logging.INFO)
-    file_handler = logging.FileHandler("eventhandler.log", mode='a+')
+    file_handler = logging.FileHandler("logs/eventhandler.log", mode='a+')
     formatter = logging.Formatter('Eventhandler Logger %(asctime)s %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)

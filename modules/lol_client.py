@@ -33,7 +33,7 @@ for spell_info in response.json()['data'].values():
 logger = logging.getLogger("LoL_client")
 logger.propagate = 0
 logger.setLevel(logging.WARNING)
-file_handler = logging.FileHandler("lol_client.log", mode='a+')
+file_handler = logging.FileHandler("logs/lol_client.log", mode='a+')
 formatter = logging.Formatter('LoL_CLIENT Logger %(asctime)s %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)

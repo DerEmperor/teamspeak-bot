@@ -15,7 +15,7 @@ event_handler: EventHandler | None = None
 command_handler: CommandHandler | None = None
 logger = logging.getLogger("moduleloader")
 logger.setLevel(logging.INFO)
-file_handler = logging.FileHandler("moduleloader.log", mode='a+')
+file_handler = logging.FileHandler("logs/moduleloader.log", mode='a+')
 formatter = logging.Formatter('Moduleloader Logger %(asctime)s %(message)s')
 file_handler.setFormatter(formatter)
 logger.addHandler(file_handler)

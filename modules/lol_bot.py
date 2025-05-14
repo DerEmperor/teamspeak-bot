@@ -168,7 +168,7 @@ class LolBot(Thread):
     logger = logging.getLogger("LoL")
     logger.propagate = 0
     logger.setLevel(logging.WARNING)
-    file_handler = logging.FileHandler("lol.log", mode='a+')
+    file_handler = logging.FileHandler("logs/lol.log", mode='a+')
     formatter = logging.Formatter('LoL Logger %(asctime)s %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)

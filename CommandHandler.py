@@ -18,7 +18,7 @@ class CommandHandler:
         self.ts3conn = ts3conn
         self.logger = logging.getLogger("textMsg")
         self.logger.setLevel(logging.INFO)
-        file_handler = logging.FileHandler("msg.log", mode='a+')
+        file_handler = logging.FileHandler("logs/msg.log", mode='a+')
         formatter = logging.Formatter('MSG Logger %(asctime)s %(message)s')
         file_handler.setFormatter(formatter)
         self.logger.addHandler(file_handler)

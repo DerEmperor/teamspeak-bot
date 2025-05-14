@@ -135,7 +135,7 @@ class AfkMover(Thread):
     logger = logging.getLogger("afk")
     logger.propagate = 0
     logger.setLevel(logging.WARNING)
-    file_handler = logging.FileHandler("afk.log", mode='a+')
+    file_handler = logging.FileHandler("logs/afk.log", mode='a+')
     formatter = logging.Formatter('AFK Logger %(asctime)s %(message)s')
     file_handler.setFormatter(formatter)
     logger.addHandler(file_handler)
