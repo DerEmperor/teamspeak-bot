@@ -11,6 +11,8 @@ import threading
 from typing import Dict
 from datetime import datetime
 
+from aiohttp import ClientResponseError
+
 from Moduleloader import *
 import Bot
 from modules.lol_client import LolUser, LolGame, LolRank
@@ -369,8 +371,18 @@ class LolBot(Thread):
         while not self.stopped.wait(max(0, 30 - run_time)):
             start = time.time()
             self.logger.debug("LoLBot running!")
-            if not await self.update_ranks_scheduled():
-                # don't update games if ranks were updated to prevent sending too many requests
-                games = await self.get_games()
-                await self.update_games_channels(games)
+            try:
+                if not await self.update_ranks_scheduled():
+                    # don't update games if ranks were updated to prevent sending too many requests
+                    games = await self.get_games()
+                    await self.update_games_channels(games)
+            except ClientResponseError as e:
+                if e.status == 503:
+                    # Service Unavailable
+                    pass
+                elif e.status == 504:
+                    # Timeout
+                    pass
+                else:
+                    raise e
             run_time = time.time() - start
