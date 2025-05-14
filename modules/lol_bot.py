@@ -374,8 +374,10 @@ class LolBot(Thread):
             try:
                 if not await self.update_ranks_scheduled():
                     # don't update games if ranks were updated to prevent sending too many requests
-                    games = await self.get_games()
-                    await self.update_games_channels(games)
+                    if sum(1 for c in bot.ts3conn.clientlist() if c.get("client_type", '1') == '0') > 1:
+                        # only display games if users are online
+                        games = await self.get_games()
+                        await self.update_games_channels(games)
             except ClientResponseError as e:
                 if e.status == 503:
                     # Service Unavailable
