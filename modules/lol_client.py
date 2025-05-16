@@ -70,6 +70,7 @@ LOL_GAME_MODES: Dict[int, str] = {
     2000: 'Tutorial1',
     2010: 'Tutorial2',
     2020: 'Tutorial3',
+    2300: 'Brawl',
 }
 
 
