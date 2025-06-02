@@ -52,6 +52,7 @@ LOL_GAME_MODES: Dict[int, str] = {
     430: 'BlindPick',
     440: 'RankedFlex',
     450: 'ARAM',
+    480: 'Swift',
     490: 'Normal',
     700: 'Clash',
     720: 'ClashARAM',
