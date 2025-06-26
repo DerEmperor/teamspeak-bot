@@ -201,7 +201,6 @@ class LolUser:
             puuid: str,
             summoner_id: str,
             game_name: str,
-            account_id: str,
             irl_name: str,
             client: RiotAPIClient = None,
     ):
@@ -211,7 +210,6 @@ class LolUser:
         self.puuid = puuid
         self.summoner_id = summoner_id
         self.game_name = game_name
-        self.account_id = account_id
         self.irl_name = irl_name
 
         self._cache[puuid] = self
@@ -228,8 +226,7 @@ class LolUser:
             puuid = res['puuid']
             res = await client.get_lol_summoner_v4_by_puuid(region='euw1', puuid=puuid)
             summoner_id = res['id']
-            account_id = res['accountId']
-        return cls(puuid, summoner_id, game_name, account_id, irl_name, client)
+        return cls(puuid, summoner_id, game_name, irl_name, client)
 
     @classmethod
     async def from_puuid(cls, puuid: str, irl_name: str, client: RiotAPIClient = None):
@@ -240,10 +237,9 @@ class LolUser:
         async with client:
             res = await client.get_lol_summoner_v4_by_puuid(region='euw1', puuid=puuid)
             summoner_id = res['id']
-            account_id = res['accountId']
             res = await client.get_account_v1_by_puuid(region='europe', puuid=puuid)
             game_name = res['gameName']
-        return cls(puuid, summoner_id, game_name, account_id, irl_name, client)
+        return cls(puuid, summoner_id, game_name, irl_name, client)
 
     @classmethod
     def get_cached(cls, puuid_or_game_name: str) -> LolUser:
@@ -251,7 +247,7 @@ class LolUser:
 
     async def get_rank(self) -> LolRank | None:
         async with self.client:
-            res = await self.client.get_lol_league_v4_entries_by_summoner(region='euw1', summoner_id=self.summoner_id)
+            res = await self.client.get_lol_league_v4_entries_by_puuid(region='euw1', puuid=self.puuid)
         for entry in res:
             if entry['queueType'] == 'RANKED_SOLO_5x5':
                 return LolRank(entry['tier'])
@@ -303,8 +299,7 @@ class LolUser:
         return f"<LoL User '{self.game_name}'>"
 
     def __repr__(self):
-        return (f"<LoL User name:'{self.game_name}', puuid: '{self.puuid}', summonerId: '{self.summoner_id}, "
-                f"accountId: '{self.account_id}'>")
+        return f"<LoL User name:'{self.game_name}', puuid: '{self.puuid}', summonerId: '{self.summoner_id}>"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):
