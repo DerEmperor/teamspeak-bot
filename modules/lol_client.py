@@ -199,7 +199,6 @@ class LolUser:
     def __init__(
             self,
             puuid: str,
-            summoner_id: str,
             game_name: str,
             irl_name: str,
             client: RiotAPIClient = None,
@@ -208,7 +207,6 @@ class LolUser:
             client = RiotAPIClient(default_headers={"X-Riot-Token": environ['RIOT_API_KEY']})
         self.client = client
         self.puuid = puuid
-        self.summoner_id = summoner_id
         self.game_name = game_name
         self.irl_name = irl_name
 
@@ -224,9 +222,7 @@ class LolUser:
         async with client:
             res = await client.get_account_v1_by_riot_id(region='europe', game_name=game_name, tag_line='euw')
             puuid = res['puuid']
-            res = await client.get_lol_summoner_v4_by_puuid(region='euw1', puuid=puuid)
-            summoner_id = res['id']
-        return cls(puuid, summoner_id, game_name, irl_name, client)
+        return cls(puuid, game_name, irl_name, client)
 
     @classmethod
     async def from_puuid(cls, puuid: str, irl_name: str, client: RiotAPIClient = None):
@@ -235,11 +231,9 @@ class LolUser:
         if client is None:
             client = RiotAPIClient(default_headers={"X-Riot-Token": environ['RIOT_API_KEY']})
         async with client:
-            res = await client.get_lol_summoner_v4_by_puuid(region='euw1', puuid=puuid)
-            summoner_id = res['id']
             res = await client.get_account_v1_by_puuid(region='europe', puuid=puuid)
             game_name = res['gameName']
-        return cls(puuid, summoner_id, game_name, irl_name, client)
+        return cls(puuid, game_name, irl_name, client)
 
     @classmethod
     def get_cached(cls, puuid_or_game_name: str) -> LolUser:
@@ -299,7 +293,7 @@ class LolUser:
         return f"<LoL User '{self.game_name}'>"
 
     def __repr__(self):
-        return f"<LoL User name:'{self.game_name}', puuid: '{self.puuid}', summonerId: '{self.summoner_id}>"
+        return f"<LoL User name:'{self.game_name}', puuid: '{self.puuid}'>"
 
     def __eq__(self, other):
         if isinstance(other, self.__class__):

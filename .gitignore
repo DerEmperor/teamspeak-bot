@@ -4,6 +4,7 @@ __conn_settings__.py
 *.log
 *.log.*
 *.pyc
+logs
 *__pycache__/
 venv
 quotes
