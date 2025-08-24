@@ -60,6 +60,7 @@ LOL_GAME_MODES: Dict[int, str] = {
     870: 'vs AI Intro',
     880: 'vs AI Beg',
     890: 'vs AI Med',
+    900: 'ARURF',
     1090: 'TFT Quick',
     1100: 'TFT Ranked',
     1110: 'TFT Tutorial',
