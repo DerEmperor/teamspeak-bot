@@ -73,6 +73,9 @@ LOL_GAME_MODES: Dict[int, str] = {
     2010: 'Tutorial2',
     2020: 'Tutorial3',
     2300: 'Brawl',
+    2400: 'AramMayham'
+    #3100: 'Classic',
+    #4220: 'Ruby',
 }
 
 
