@@ -287,7 +287,7 @@ class LolUser:
         return LolGame(
             game_id=game['gameId'],
             mode=translate_lol_mode(game['gameMode'], game['gameType'], game['gameQueueConfigId']),
-            time=game['gameLength'],
+            time=game['gameLength'] + 3 * 60,  # there is a 3m delay
             ts_participants=ts_participants,
             lol_participants=lol_participants,
             banned_champions=banned_champs,
