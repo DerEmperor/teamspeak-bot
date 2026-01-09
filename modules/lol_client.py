@@ -264,7 +264,7 @@ class LolUser:
 
         cached = LolGame.get_cached(game['gameId'])
         if cached is not None:
-            cached.time = game['gameLength']
+            cached.time = game['gameLength'] + 3 * 60  # there is a 3m delay
             return cached
 
         ts_participants: List[LolUser] = []
