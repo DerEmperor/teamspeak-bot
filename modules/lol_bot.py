@@ -139,12 +139,20 @@ def stop_lol(sender=None, msg=None):
 @group('Kaiser', 'Truchsess')
 def lol_update_ranks(sender=None, msg=None):
     """
-    Stop the LoL bot by setting the lolStopper signal and undefining the mover.
+    Update ranks.
     """
     global lol_bot
     asyncio.run(lol_bot.update_ranks())
     Bot.send_msg_to_client(bot.ts3conn, sender, "LoL ranks updated.")
 
+@command('lol_get_channel_ids', 'lol_cids')
+@group('Kaiser', 'Truchsess')
+def lol_update_ranks(sender=None, msg=None):
+    """
+    get channel ids.
+    """
+    global lol_bot
+    Bot.send_msg_to_client(bot.ts3conn, sender, f"Active channel ids: {lol_bot.lol_channel_ids}.")
 
 @setup
 def setup(ts3bot, **kwargs):
