@@ -178,7 +178,7 @@ class LolBot(Thread):
     """
     logger = logging.getLogger("LoL")
     logger.propagate = 0
-    logger.setLevel(logging.WARNING)
+    logger.setLevel(logging.INFO)
     file_handler = logging.FileHandler("logs/lol.log", mode='a+')
     formatter = logging.Formatter('LoL Logger %(asctime)s %(message)s')
     file_handler.setFormatter(formatter)
@@ -208,6 +208,7 @@ class LolBot(Thread):
             if channel.get('channel_topic', '') == LOL_CHANNEL_ATTRS['channel_topic']:
                 if 'cid' in channel:
                     self.lol_channel_ids.append(int(channel['cid']))
+        self.logger.info('found these channels on startup: %s', self.lol_channel_ids)
 
     def run(self):
         """
@@ -279,7 +280,7 @@ class LolBot(Thread):
             self.rank_updated = False
             return False
         elif not self.rank_updated and hour == 5:
-            self.logger.warning('update ranks')
+            self.logger.info('update ranks')
             LolGame.clear_cache()
             await self.update_ranks()
             self.rank_updated = True
