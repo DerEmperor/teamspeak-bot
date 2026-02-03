@@ -40,6 +40,7 @@ LOL_CHANNEL_ATTRS = {
     "pid": "80",
     "channel_name": "[cspacer]Name",
     "channel_description": 'description',
+    'channel_topic': 'lol_game',
     "channel_maxclients": "0",
     'channel_maxfamilyclients': '-1',
     'channel_flag_maxclients_unlimited': '0',
@@ -194,6 +195,11 @@ class LolBot(Thread):
         self.rank_updated = False
         self.active_games = []
         self.lol_channel_ids: List[int] = []
+        channels = ts3conn.channellist(params=['topic'])
+        for channel in channels:
+            if channel.get('channel_topic', '') == LOL_CHANNEL_ATTRS['channel_topic']:
+                if 'cid' in channel:
+                    self.lol_channel_ids.append(int(channel['cid']))
 
     def run(self):
         """
