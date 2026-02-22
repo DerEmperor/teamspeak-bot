@@ -119,7 +119,7 @@ def translate_lol_mode(game_mode: str, game_type: str, queue_id: int) -> str:
     # https://static.developer.riotgames.com/docs/lol/queues.json
     if queue_id in LOL_GAME_MODES:
         res = LOL_GAME_MODES[queue_id]
-        if game_type == 'CUSTOM':
+        if game_type == 'CUSTOM' and queue_id not in [700, 720]:  # clash is always custom
             res += ' Custom'
         elif game_type == 'TUTORIAL':
             res += ' Tut'
