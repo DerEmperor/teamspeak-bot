@@ -68,6 +68,7 @@ LOL_GAME_MODES: Dict[int, str] = {
     1210: 'TFT Treasure',
     1700: 'Arena',
     1710: 'Arena',
+    1740: 'Arena', # Not in official list ????
     1900: 'URF Pick',
     2000: 'Tutorial1',
     2010: 'Tutorial2',
