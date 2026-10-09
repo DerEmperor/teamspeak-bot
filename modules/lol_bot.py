@@ -147,7 +147,7 @@ def lol_update_ranks(sender=None, msg=None):
 
 @command('lol_get_channel_ids', 'lol_cids')
 @group('Kaiser', 'Truchsess')
-def lol_update_ranks(sender=None, msg=None):
+def lol_active_channels(sender=None, msg=None):
     """
     get channel ids.
     """
@@ -389,7 +389,8 @@ class LolBot(Thread):
             try:
                 if not await self.update_ranks_scheduled():
                     # don't update games if ranks were updated to prevent sending too many requests
-                    if sum(1 for c in bot.ts3conn.clientlist() if c.get("client_type", '1') == '0') > 1:
+                    num_users = sum(1 for c in bot.ts3conn.clientlist() if c.get("client_type", '1') == '0')
+                    if num_users > 1 or len(self.lol_channel_ids) > 0:
                         # only display games if users are online
                         games = await self.get_games()
                         await self.update_games_channels(games)
